@@ -1,0 +1,99 @@
+generator client {
+  provider = "prisma-client"
+}
+
+source db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Agency {
+  id                 String    @id @default(cuid())
+  name               String
+  contact_number     String
+  timezone           String
+  created_at         DateTime  @default(now())
+  updated_at         DateTime  @updatedAt
+  patients           Patient[]
+  callLogs           CallLog[]
+  dailySummaries     DailySummary[]
+
+  @@map("agencies")
+}
+
+model Patient {
+  id                 String    @id @default(cuid())
+  agency_id          String
+  name               String
+  phone_number       String
+  timezone           String
+  consent_captured   Boolean   @default(false)
+  consent_captured_at DateTime?
+  created_at         DateTime  @default(now())
+  updated_at         DateTime  @updatedAt
+  agency             Agency    @relation(fields: [agency_id], references: [id])
+  callLogs           CallLog[]
+  dailySummaries     DailySummary[]
+
+  @@map("patients")
+}
+
+model CallLog {
+  id                   String    @id @default(cuid())
+  patient_id           String
+  duration_seconds    Int
+  transcript_encrypted String
+  recording_url       String?
+  status              String    @default("pending")
+  started_at          DateTime
+  ended_at            DateTime?
+  created_at           DateTime  @default(now())
+  patient             Patient  @relation(fields: [patient_id], references: [id])
+  agency              Agency   @relation(fields: [patient_id], references: [id])
+  dailySummary        DailySummary?
+
+  @@map("call_logs")
+}
+
+model DailySummary {
+  id                    String    @id @default(cuid())
+  patient_id            String
+  date                  DateTime
+  medication_taken     Boolean
+  pain_level            Int
+  mood                  String
+  concerning_events    String[]
+  escalation_required   Boolean   @default(false)
+  notes                 String
+  created_at            DateTime  @default(now())
+  patient               Patient  @relation(fields: [patient_id], references: [id])
+  callLog              CallLog?  @relation
+
+  @@unique([patient_id, date])
+  @@map("daily_summaries")
+}
+
+model EncryptedContent {
+  id              String   @id @default(cuid())
+  content_type    String   // "transcript", "recording"
+  encrypted_data   String   // Base64 encrypted
+  encryption_key   String   // Reference to KMS
+  patient_id      String
+  created_at      DateTime @default(now())
+  patient         Patient  @relation(fields: [patient_id], references: [id])
+
+  @@map("encrypted_contents")
+}
+
+model AuditLog {
+  id              String   @id @default(cuid())
+  action          String
+  entity_type     String
+  entity_id       String
+  performed_by    String   // user ID
+  performed_at    DateTime @default(now())
+  ip_address      String?
+  user_agent      String?
+
+  @@map("audit_logs")
+}
