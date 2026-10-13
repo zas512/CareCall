@@ -19,3 +19,4 @@ export const { ObserveModule, ObserveInstrument } = createObserveModule();
   providers: [AppService],
 })
 export class AppModule {}
+No PII in logs; encrypt at rest

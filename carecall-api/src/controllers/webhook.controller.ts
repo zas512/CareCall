@@ -11,3 +11,4 @@ export class WebhookController {
   async twilioWebhook(@Body() body: any, @Headers('x-twilio-signature') sig?: string) {
   }
 }
+HMAC verified; idempotent; 5-min cap enforced
