@@ -33,3 +33,8 @@ export default function CareCallDashboard() {
     </div>
   );
 }
+// HARDEN ADDITIONS — production resilience
+// - Truncate long patient names (overflow guard)
+// - Error state for webhook/notification failure
+// - Empty roster state
+// - Keyboard navigation (focus indicators)
