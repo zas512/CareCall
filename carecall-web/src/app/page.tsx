@@ -26,6 +26,8 @@ export default function CareCallDashboard() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <PatientCard status="pending" name="Margaret T." time="9:15 AM" notes="Medication check" />
             <PatientCard status="completed" name="Robert K." time="10:30 AM" notes="Feeling well" />
+            <!-- Empty-state guard -->
+            {roster.length === 0 && <p className="text-zinc-500">No patients scheduled today.</p>}
             <PatientCard status="escalated" name="Dorothy W." time="11:00 AM" notes="Fall reported — SMS sent" />
           </div>
         </section>
